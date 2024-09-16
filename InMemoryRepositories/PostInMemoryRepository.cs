@@ -8,46 +8,54 @@ namespace InMemoryRepositories
 {
     public class PostInMemoryRepository : IPostRepository
     {
-        private  List<Post> posts = new();
+        public readonly List<Post> Posts = new List<Post>();  // Correct initialization
 
         public Task<Post> AddAsync(Post post)
         {
-            post.Id = posts.Any() ? posts.Max(p => p.Id) + 1 : 1;
-            posts.Add(post);
+            if (Posts.Any(p => p.Title == post.Title))
+            {
+                throw new InvalidOperationException($"A post with the title '{post.Title}' already exists.");
+            }
+
+            post.Id = Posts.Count != 0 ? Posts.Max(p => p.Id) + 1 : 1;
+            Posts.Add(post);
             return Task.FromResult(post);
         }
 
         public Task UpdateAsync(Post post)
         {
-            Post? existingPost = posts.SingleOrDefault(p => p.Id == post.Id);
+            var existingPost = Posts.SingleOrDefault(p => p.Id == post.Id);
             if (existingPost == null)
             {
-                throw new InvalidOperationException($"Post with ID '{post.Id}' not found");
+                throw new InvalidOperationException($"Post with ID '{post.Id}' not found.");
             }
 
-            posts.Remove(existingPost);
-            posts.Add(post);
+            // Directly update the fields of the existing post
+            existingPost.Title = post.Title;
+            existingPost.Body = post.Body;
+            existingPost.UserId = post.UserId;
+
             return Task.CompletedTask;
         }
 
         public Task DeleteAsync(int id)
         {
-            Post? postToRemove = posts.SingleOrDefault(p => p.Id == id);
+            var postToRemove = Posts.SingleOrDefault(p => p.Id == id);
             if (postToRemove == null)
             {
-                throw new InvalidOperationException($"Post with ID '{id}' not found");
+                throw new InvalidOperationException($"Post with ID '{id}' not found.");
             }
 
-            posts.Remove(postToRemove);
-            return Task.CompletedTask;
+            Posts.Remove(postToRemove);
+            return Task.FromResult(true);  // Return true to indicate successful deletion
         }
 
         public Task<Post> GetSingleAsync(int id)
         {
-            Post? post = posts.SingleOrDefault(p => p.Id == id);
+            var post = Posts.SingleOrDefault(p => p.Id == id);
             if (post == null)
             {
-                throw new InvalidOperationException($"Post with ID '{id}' not found");
+                throw new InvalidOperationException($"Post with ID '{id}' not found.");
             }
 
             return Task.FromResult(post);
@@ -55,7 +63,10 @@ namespace InMemoryRepositories
 
         public IQueryable<Post> GetMany()
         {
-            return posts.AsQueryable();
+            return Posts.AsQueryable();
         }
+        
+       
+
     }
 }
