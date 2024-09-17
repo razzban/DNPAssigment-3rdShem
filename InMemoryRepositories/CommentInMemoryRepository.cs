@@ -1,61 +1,72 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
 using Entities;
 using RepositoryContracts;
 
 namespace InMemoryRepositories
 {
+    // Implement the ICommentRepository interface
     public class CommentInMemoryRepository : ICommentRepository
     {
-        private  List<Comment> comments = new();
-
-        public Task<Comment> AddAsync(Comment comment)
+        //list of comments
+        private readonly List<Comment> _comments = [];
+        
+        public Task<Comment> AddCommentAsync(Comment comment)
         {
-            comment.Id = comments.Any() ? comments.Max(c => c.Id) + 1 : 1;
-            comments.Add(comment);
+            // Set the comment ID to the next available ID
+            comment.CommentId = _comments.Count != 0 ? _comments.Max(c => c.CommentId) + 1 : 1;
+            _comments.Add(comment);
             return Task.FromResult(comment);
         }
 
-        public Task UpdateAsync(Comment comment)
+        public Task UpdateCommentAsync(Comment comment)
         {
-            Comment? existingComment = comments.SingleOrDefault(c => c.Id == comment.Id);
+            // Find the existing comment by ID
+            var existingComment = _comments.SingleOrDefault(c => c.CommentId == comment.CommentId);
+
+            // If the comment does not exist, throw an exception
             if (existingComment == null)
             {
-                throw new InvalidOperationException($"Comment with ID '{comment.Id}' not found");
+                throw new InvalidOperationException($"Comment with ID '{comment.CommentId}' not found");
             }
 
-            comments.Remove(existingComment);
-            comments.Add(comment);
+            // Update the existing comment's fields 
+            existingComment.Body = comment.Body;
+            existingComment.UserId = comment.UserId;  // Update if userId changes (if needed)
+
             return Task.CompletedTask;
         }
 
-        public Task DeleteAsync(int id)
+
+        public Task DeleteCommentAsync(int id)
         {
-            Comment? commentToRemove = comments.SingleOrDefault(c => c.Id == id);
+            // Find the comment to remove by ID
+            var commentToRemove = _comments.SingleOrDefault(c => c.CommentId == id);
+            // If the comment does not exist, throw an exception
             if (commentToRemove == null)
             {
                 throw new InvalidOperationException($"Comment with ID '{id}' not found");
             }
-
-            comments.Remove(commentToRemove);
+            // Remove the comment from the list
+            _comments.Remove(commentToRemove);
             return Task.CompletedTask;
         }
 
-        public Task<Comment> GetSingleAsync(int id)
+        public Task<Comment> GetSingleCommentAsync(int id)
         {
-            Comment? comment = comments.SingleOrDefault(c => c.Id == id);
+            // Find the comment by ID and return it
+            var comment = _comments.SingleOrDefault(c => c.CommentId == id);
+            // If the comment does not exist, throw an exception
             if (comment == null)
             {
                 throw new InvalidOperationException($"Comment with ID '{id}' not found");
             }
-
             return Task.FromResult(comment);
         }
 
-        public IQueryable<Comment> GetMany()
+        public IQueryable<Comment> GetCommentMany()
         {
-            return comments.AsQueryable();
+            // Return the list of comments as a queryable collection
+            return _comments.AsQueryable();
         }
     }
 }
