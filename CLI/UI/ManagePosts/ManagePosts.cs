@@ -52,12 +52,14 @@ public class ManagePosts(IPostRepository postRepo)
 
     private void ViewPosts()
     {
+        // Get all posts
         var posts = postRepo.GetPostMany();
-
+        // Print each post and its comments
         foreach (var post in posts)
         {
+            // Print post details
             Console.WriteLine($"Post ID: {post.PostId}, Title: {post.Title}, Body: {post.Body}");
-
+       // Print comments if any
             if (post.Comments.Count != 0)
             {
                 Console.WriteLine("  Comments:");

@@ -1,14 +1,14 @@
 ﻿using CLI.UI;
 using Entities;
-using InMemoryRepositories;
+using FileRepositories;
 using RepositoryContracts;
 
 Console.WriteLine("Welcome to the CLI!- Starting....");
 
 // Initialize the repositories
-IUserRepository userRepository = new UserInMemoryRepository();
-IPostRepository postRepository = new PostInMemoryRepository();
-ICommentRepository commentRepository = new CommentInMemoryRepository();
+IUserRepository userRepository = new UserFileRepository();
+IPostRepository postRepository = new PostFileRepository();
+ICommentRepository commentRepository = new CommentFileRepository();
 
 // this dummy data is created by ChatGPT: https://app.chatgpt.com/
 // Add the dummy data
