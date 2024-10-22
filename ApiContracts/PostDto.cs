@@ -1,10 +1,10 @@
-﻿namespace ApiContracts;
-
-public class PostDto
+﻿namespace ApiContracts
 {
-    public int id { get; set; }
-    public int userId { get; set; }
-    public required string title { get; set; }
-    public required string body { get; set; }
-    
+    public class PostDto
+    {
+        public int PostId { get; set; }
+        public int UserId { get; set; }
+        public string Title { get; set; }
+        public string Body { get; set; }
+    }
 }

@@ -1,8 +1,9 @@
-﻿namespace ApiContracts;
-
-public class CreatePostDto
+﻿namespace ApiContracts
 {
-    public int UserId { get; set; }
-    public required string Title { get; set; }
-    public required string Body { get; set; }
+    public class CreatePostDto
+    {
+        public int UserId { get; set; }
+        public string Title { get; set; }
+        public string Body { get; set; }
+    }
 }

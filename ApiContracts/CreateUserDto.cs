@@ -1,7 +1,8 @@
-﻿namespace ApiContracts;
-
-public class CreateUserDto
+﻿namespace ApiContracts
 {
-    public required string Name { get; set; }
-    public required string Password { get; set; }
+    public class CreateUserDto
+    {
+        public string Name { get; set; }
+        public string Password { get; set; }
+    }
 }

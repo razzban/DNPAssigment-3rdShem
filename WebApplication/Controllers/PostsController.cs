@@ -3,7 +3,7 @@ using Entities;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryContracts;
 
-namespace WebAPI.Controllers;
+namespace WebApplication.Controllers;
 
 [ApiController]
 [Route("posts")]
@@ -16,23 +16,35 @@ public class PostsController : ControllerBase
         _postRepository = postRepository;
     }
 
+    // Create a new post
     [HttpPost]
     public async Task<IResult> CreateAsync(CreatePostDto postDto)
     {
         Post createdPost = await _postRepository.AddPostAsync(new Post
         {
-            UserId = postDto.UserId, Title = postDto.Title, Body = postDto.Body
+            UserId = postDto.UserId,
+            Title = postDto.Title,
+            Body = postDto.Body
         });
         return Results.Created($"posts/{createdPost.PostId}", createdPost);
     }
 
+    // Get a single post by ID
     [HttpGet("{id:int}")]
     public async Task<IResult> GetSingleAsync(int id)
     {
         Post post = await _postRepository.GetSinglePostAsync(id);
-        return Results.Ok(new PostDto {  userId = post.PostId, title= post.Title, body = post.Body });
+        var postDto = new PostDto
+        {
+            PostId = post.PostId,
+            UserId = post.UserId,
+            Title = post.Title,
+            Body = post.Body
+        };
+        return Results.Ok(postDto);
     }
 
+    // Get multiple posts, optionally filtering by userId
     [HttpGet]
     public async Task<IResult> GetManyAsync([FromQuery] int? userId)
     {
@@ -40,25 +52,35 @@ public class PostsController : ControllerBase
 
         if (userId is not null)
         {
-            posts = posts.Where(p => p.UserId.Equals(userId));
+            posts = posts.Where(p => p.UserId == userId);
         }
 
-        IQueryable<PostDto> postDtos =
-            posts.Select(p => new PostDto {  = p.PostId, UserId = p.UserId, Title = p.Title, Body = p.Body });
+        IQueryable<PostDto> postDtos = posts.Select(p => new PostDto
+        {
+            PostId = p.PostId,
+            UserId = p.UserId,
+            Title = p.Title,
+            Body = p.Body
+        });
 
         return Results.Ok(postDtos);
     }
 
+    // Update an existing post
     [HttpPut("{id:int}")]
     public async Task<IResult> UpdateAsync(int id, CreatePostDto postDto)
     {
         await _postRepository.UpdatePostAsync(new Post
         {
-            PostId = id, UserId = postDto.UserId, Title = postDto.Title, Body = postDto.Body
+            PostId = id,
+            UserId = postDto.UserId,
+            Title = postDto.Title,
+            Body = postDto.Body
         });
         return Results.Ok();
     }
 
+    // Delete a post by ID
     [HttpDelete("{id:int}")]
     public async Task<IResult> DeleteAsync(int id)
     {
